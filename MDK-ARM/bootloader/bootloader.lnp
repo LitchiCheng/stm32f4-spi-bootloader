@@ -7,6 +7,8 @@
 "bootloader\common.o"
 "bootloader\flash_if.o"
 "bootloader\menu.o"
+"bootloader\segger_rtt.o"
+"bootloader\segger_rtt_printf.o"
 "bootloader\stm32f4xx_hal_spi.o"
 "bootloader\stm32f4xx_hal_rcc.o"
 "bootloader\stm32f4xx_hal_rcc_ex.o"

@@ -74,7 +74,10 @@ uint8_t CalcChecksum(const uint8_t *p_data, uint32_t size);
 
 SPI_HandleTypeDef hspi2;
 
+
+
 void Serial_PutByte(uint8_t xx){
+	
 }
 
 /* Private functions ---------------------------------------------------------*/

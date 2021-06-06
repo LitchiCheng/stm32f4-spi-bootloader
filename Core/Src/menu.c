@@ -74,6 +74,11 @@ uint8_t aFileName[FILE_NAME_LENGTH];
 void SerialDownload(void);
 void SerialUpload(void);
 
+#include "SEGGER_RTT.h"
+void Serial_PutString(uint8_t* xx){
+	RTT_printf("%s", xx);
+}
+
 /* Private functions ---------------------------------------------------------*/
 
 /**
@@ -81,11 +86,6 @@ void SerialUpload(void);
   * @param  None
   * @retval None
   */
-  
-void Serial_PutString(uint8_t* xx){
-	return;
-}
-  
 void SerialDownload(void)
 {
   uint8_t number[11] = {0};
