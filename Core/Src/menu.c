@@ -74,6 +74,7 @@ uint8_t aFileName[FILE_NAME_LENGTH];
 void SerialDownload(void);
 void SerialUpload(void);
 
+extern SPI_HandleTypeDef hspi2;
 #include "SEGGER_RTT.h"
 void Serial_PutString(uint8_t* xx){
 	RTT_printf("%s", xx);
@@ -133,7 +134,7 @@ void SerialUpload(void)
 
   Serial_PutString((uint8_t *)"\n\n\rSelect Receive File\n\r");
 
-  //HAL_UART_Receive(&UartHandle, &status, 1, RX_TIMEOUT);
+  HAL_SPI_Receive(&hspi2, &status, 1, RX_TIMEOUT);
   if ( status == CRC16)
   {
     /* Transmit the flash image through ymodem protocol */
@@ -193,8 +194,10 @@ void Main_Menu(void)
     //__HAL_UART_FLUSH_DRREGISTER(&UartHandle);
 	
     /* Receive key */
-    //HAL_UART_Receive(&UartHandle, &key, 1, RX_TIMEOUT);
-
+    HAL_SPI_Receive(&hspi2, &key, 1, RX_TIMEOUT);
+	
+	//key = '1';
+	
     switch (key)
     {
     case '1' :

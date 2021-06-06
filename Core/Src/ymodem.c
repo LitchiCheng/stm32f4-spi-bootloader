@@ -72,10 +72,9 @@ uint16_t UpdateCRC16(uint16_t crc_in, uint8_t byte);
 uint16_t Cal_CRC16(const uint8_t* p_data, uint32_t size);
 uint8_t CalcChecksum(const uint8_t *p_data, uint32_t size);
 
-SPI_HandleTypeDef hspi2;
+extern SPI_HandleTypeDef hspi2;
 
-
-
+#include "SEGGER_RTT.h"
 void Serial_PutByte(uint8_t xx){
 	HAL_SPI_Transmit_DMA(&hspi2, &xx,1);
 }
@@ -102,7 +101,7 @@ static HAL_StatusTypeDef ReceivePacket(uint8_t *p_data, uint32_t *p_length, uint
 
   *p_length = 0;
 	status = HAL_SPI_Receive(&hspi2, &char1,1, timeout);
-
+	//RTT_printf("status is 0x%02x\r\n", char1);
   if (status == HAL_OK)
   {
     switch (char1)
