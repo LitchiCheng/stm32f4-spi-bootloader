@@ -1,29 +1,14 @@
-/* USER CODE BEGIN Header */
-/**
-  ******************************************************************************
-  * @file           : main.c
-  * @brief          : Main program body
-  ******************************************************************************
-  * @attention
-  *
-  * <h2><center>&copy; Copyright (c) 2021 STMicroelectronics.
-  * All rights reserved.</center></h2>
-  *
-  * This software component is licensed by ST under BSD 3-Clause license,
-  * the "License"; You may not use this file except in compliance with the
-  * License. You may obtain a copy of the License at:
-  *                        opensource.org/licenses/BSD-3-Clause
-  *
-  ******************************************************************************
-  */
-/* USER CODE END Header */
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
+#include "menu.h"
 
-/* Private includes ----------------------------------------------------------*/
-/* USER CODE BEGIN Includes */
+/** @addtogroup STM32F4xx_IAP_Main
+  * @{
+  */
 
-/* USER CODE END Includes */
+/* Exported variables --------------------------------------------------------*/
+/* UART handler declaration */
+//UART_HandleTypeDef UartHandle;
 
 /* Private typedef -----------------------------------------------------------*/
 /* USER CODE BEGIN PTD */
@@ -33,22 +18,21 @@
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
 /* USER CODE END PD */
-
 /* Private macro -------------------------------------------------------------*/
 /* USER CODE BEGIN PM */
-
 /* USER CODE END PM */
-
 /* Private variables ---------------------------------------------------------*/
-SPI_HandleTypeDef hspi2;
+extern pFunction JumpToApplication;
+extern uint32_t JumpAddress;
+
+extern SPI_HandleTypeDef hspi2;
 DMA_HandleTypeDef hdma_spi2_rx;
 DMA_HandleTypeDef hdma_spi2_tx;
 
 /* USER CODE BEGIN PV */
-
 /* USER CODE END PV */
-
 /* Private function prototypes -----------------------------------------------*/
+//static void IAP_Init(void);
 void SystemClock_Config(void);
 static void MX_GPIO_Init(void);
 static void MX_DMA_Init(void);
@@ -63,8 +47,9 @@ static void MX_SPI2_Init(void);
 /* USER CODE END 0 */
 
 /**
-  * @brief  The application entry point.
-  * @retval int
+  * @brief  Main program.
+  * @param  None
+  * @retval None
   */
 int main(void)
 {
@@ -93,6 +78,32 @@ int main(void)
   MX_DMA_Init();
   MX_SPI2_Init();
   /* USER CODE BEGIN 2 */
+  
+  /* Initialize Key Button mounted on STM324xG-EVAL board */
+  //BSP_PB_Init(BUTTON_KEY, BUTTON_MODE_GPIO);
+
+  /* Test if Key push-button is pressed */
+  if (/*BSP_PB_GetState(BUTTON_KEY) == GPIO_PIN_RESET*/1)
+  { 
+    /* Execute the IAP driver in order to reprogram the Flash */
+    //IAP_Init();
+    /* Display main menu */
+    Main_Menu ();
+  }
+  /* Keep the user application running */
+  else
+  {
+    /* Test if user code is programmed starting from address "APPLICATION_ADDRESS" */
+    if (((*(__IO uint32_t*)APPLICATION_ADDRESS) & 0x2FFE0000 ) == 0x20000000)
+    {
+      /* Jump to user application */
+      JumpAddress = *(__IO uint32_t*) (APPLICATION_ADDRESS + 4);
+      JumpToApplication = (pFunction) JumpAddress;
+      /* Initialize user application's Stack Pointer */
+      __set_MSP(*(__IO uint32_t*) APPLICATION_ADDRESS);
+      JumpToApplication();
+    }
+  }
 
   /* USER CODE END 2 */
 
@@ -256,5 +267,10 @@ void assert_failed(uint8_t *file, uint32_t line)
   /* USER CODE END 6 */
 }
 #endif /* USE_FULL_ASSERT */
+
+/**
+  * @}
+  */
+
 
 /************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/
