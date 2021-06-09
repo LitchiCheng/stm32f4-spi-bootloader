@@ -88,6 +88,11 @@ int main(void)
     /* Execute the IAP driver in order to reprogram the Flash */
     //IAP_Init();
     /* Display main menu */
+//	while(1){
+//		char xx = 'C';
+//		HAL_SPI_Transmit(&hspi2, (uint8_t*)&xx, 1, 100);
+//		HAL_Delay(100);
+//	}
     Main_Menu ();
   }
   /* Keep the user application running */

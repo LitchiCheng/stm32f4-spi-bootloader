@@ -76,7 +76,8 @@ extern SPI_HandleTypeDef hspi2;
 
 #include "SEGGER_RTT.h"
 void Serial_PutByte(uint8_t xx){
-	HAL_SPI_Transmit_DMA(&hspi2, &xx,1);
+	RTT_printf("Serial_PutByte 0x%02x\r\n", xx);
+	HAL_SPI_Transmit(&hspi2, &xx,1,900000000);
 }
 
 /* Private functions ---------------------------------------------------------*/
@@ -101,7 +102,7 @@ static HAL_StatusTypeDef ReceivePacket(uint8_t *p_data, uint32_t *p_length, uint
 
   *p_length = 0;
 	status = HAL_SPI_Receive(&hspi2, &char1,1, timeout);
-	//RTT_printf("status is 0x%02x\r\n", char1);
+	RTT_printf("ReceivePacket is 0x%02x\r\n", char1);
   if (status == HAL_OK)
   {
     switch (char1)
@@ -137,6 +138,11 @@ static HAL_StatusTypeDef ReceivePacket(uint8_t *p_data, uint32_t *p_length, uint
     if (packet_size >= PACKET_SIZE )
     {
 		status = HAL_SPI_Receive(&hspi2, &p_data[PACKET_NUMBER_INDEX],packet_size + PACKET_OVERHEAD_SIZE, timeout);
+		RTT_printf("pack data %d\r\n", packet_size + PACKET_OVERHEAD_SIZE);
+		for(int i=0;i<packet_size + PACKET_OVERHEAD_SIZE;i++){
+			RTT_printf("0x%02x ", (&p_data[PACKET_NUMBER_INDEX])[i]);
+		}
+		RTT_printf("\r\n");
 
       /* Simple packet sanity check */
       if (status == HAL_OK )
@@ -155,7 +161,10 @@ static HAL_StatusTypeDef ReceivePacket(uint8_t *p_data, uint32_t *p_length, uint
           {
             packet_size = 0;
             status = HAL_ERROR;
-          }
+			RTT_printf("check fail\r\n");
+          }else{
+			RTT_printf("check ok\r\n");
+		  }
         }
       }
       else
@@ -353,6 +362,7 @@ COM_StatusTypeDef Ymodem_Receive ( uint32_t *p_size )
             case 0:
               /* End of transmission */
               Serial_PutByte(ACK);
+				RTT_printf("eot ......\r\n");
               file_done = 1;
               break;
             default:
@@ -378,6 +388,7 @@ COM_StatusTypeDef Ymodem_Receive ( uint32_t *p_size )
 
                     /* File size extraction */
                     aFileName[i++] = '\0';
+					RTT_printf("file name %s\r\n", aFileName);
                     i = 0;
                     file_ptr ++;
                     while ( (*file_ptr != ' ') && (i < FILE_SIZE_LENGTH))
@@ -398,11 +409,13 @@ COM_StatusTypeDef Ymodem_Receive ( uint32_t *p_size )
                       result = COM_LIMIT;
                     }
                     /* erase user application area */
+					RTT_printf("FLASH_If_Erase start \r\n");
                     FLASH_If_Erase(APPLICATION_ADDRESS);
                     *p_size = filesize;
 
                     Serial_PutByte(ACK);
                     Serial_PutByte(CRC16);
+					RTT_printf("CRC16 end \r\n");
                   }
                   /* File header packet is empty, end session */
                   else
@@ -432,6 +445,7 @@ COM_StatusTypeDef Ymodem_Receive ( uint32_t *p_size )
                 }
                 packets_received ++;
                 session_begin = 1;
+				RTT_printf("end \r\n");
               }
               break;
           }

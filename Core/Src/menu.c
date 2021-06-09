@@ -195,6 +195,8 @@ void Main_Menu(void)
 	
     /* Receive key */
     HAL_SPI_Receive(&hspi2, &key, 1, RX_TIMEOUT);
+	RTT_printf("key is 0x%02x\r\n", key);
+	
 	
 	//key = '1';
 	
@@ -202,6 +204,9 @@ void Main_Menu(void)
     {
     case '1' :
       /* Download user application in the Flash */
+		char xx = 'C';
+		HAL_SPI_Transmit(&hspi2, (uint8_t*)&xx, 1, 100);
+		RTT_printf("EMIT SIGNAL for down\r\n");
       SerialDownload();
       break;
     case '2' :
