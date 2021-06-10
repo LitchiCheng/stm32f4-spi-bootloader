@@ -746,6 +746,7 @@ HAL_StatusTypeDef HAL_SPI_UnRegisterCallback(SPI_HandleTypeDef *hspi, HAL_SPI_Ca
   */
 HAL_StatusTypeDef HAL_SPI_Transmit(SPI_HandleTypeDef *hspi, uint8_t *pData, uint16_t Size, uint32_t Timeout)
 {
+	
   uint32_t tickstart;
   HAL_StatusTypeDef errorcode = HAL_OK;
   uint16_t initial_TxXferCount;

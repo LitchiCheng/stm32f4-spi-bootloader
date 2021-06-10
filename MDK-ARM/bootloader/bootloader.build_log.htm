@@ -22,23 +22,19 @@ Dialog DLL:      TCM.DLL V1.36.1.0
  
 <h2>Project:</h2>
 F:\stm32f407\SRC800-bootloader\bootloader\MDK-ARM\bootloader.uvprojx
-Project File Date:  06/06/2021
+Project File Date:  06/10/2021
 
 <h2>Output:</h2>
 *** Using Compiler 'V5.06 update 6 (build 750)', folder: 'D:\keil\ARM\ARMCC\Bin'
 Build target 'bootloader'
-compiling menu.c...
-..\Core\Src\menu.c(221): warning:  #1182-D: a declaration cannot have a label
-  		char xx = 'C';
-..\Core\Src\menu.c(217): warning:  #546-D: transfer of control bypasses initialization of:
-            variable "xx"  (declared at line 221)
-      switch (key)
-      ^
-..\Core\Src\menu.c: 2 warnings, 0 errors
+compiling ymodem.c...
+..\Core\Src\ymodem.c(375): warning:  #1182-D: a declaration cannot have a label
+  				static uint8_t cnt = 0;
+..\Core\Src\ymodem.c: 1 warning, 0 errors
 linking...
-Program Size: Code=15060 RO-data=924 RW-data=152 ZI-data=3472  
+Program Size: Code=15240 RO-data=924 RW-data=156 ZI-data=3476  
 FromELF: creating hex file...
-"bootloader\bootloader.axf" - 0 Error(s), 2 Warning(s).
+"bootloader\bootloader.axf" - 0 Error(s), 1 Warning(s).
 
 <h2>Software Packages used:</h2>
 

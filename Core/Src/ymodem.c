@@ -353,6 +353,7 @@ COM_StatusTypeDef Ymodem_Receive ( uint32_t *p_size )
     {
       switch (ReceivePacket(aPacketData, &packet_length, DOWNLOAD_TIMEOUT))
       {
+		  
         case HAL_OK:
           errors = 0;
           switch (packet_length)
@@ -371,7 +372,12 @@ COM_StatusTypeDef Ymodem_Receive ( uint32_t *p_size )
               break;
             default:
               /* Normal packet */
-				RTT_printf("packet receive %d...........\r\n", packets_received);
+				static uint8_t cnt = 0;
+				if(cnt++ == 10){
+					cnt = 0;
+					HAL_GPIO_TogglePin(GPIOC, GPIO_PIN_8);
+				}
+				RTT_printf("packet receive %d........... %d\r\n", packets_received, cnt);
               if (aPacketData[PACKET_NUMBER_INDEX] != (uint8_t)packets_received)
               {
                 Serial_PutByte(NAK);

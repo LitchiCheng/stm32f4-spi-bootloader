@@ -185,7 +185,8 @@ void Main_Menu(void)
 
   while (1)
   {
-
+	HAL_GPIO_WritePin(GPIOC, GPIO_PIN_8, GPIO_PIN_SET);
+	HAL_GPIO_WritePin(GPIOC, GPIO_PIN_9, GPIO_PIN_SET);
     /* Test if any sector of Flash memory where user application will be loaded is write protected */
     FlashProtection = FLASH_If_GetWriteProtectionStatus();
     
