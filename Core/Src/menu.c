@@ -216,12 +216,17 @@ void Main_Menu(void)
     case '3' :
       Serial_PutString((uint8_t *)"Start program execution......\r\n\n");
       /* execute the new program */
-      JumpAddress = *(__IO uint32_t*) (APPLICATION_ADDRESS + 4);
-      /* Jump to user application */
-      JumpToApplication = (pFunction) JumpAddress;
-      /* Initialize user application's Stack Pointer */
-      __set_MSP(*(__IO uint32_t*) APPLICATION_ADDRESS);
-      JumpToApplication();
+	 if (((*(__IO uint32_t*)APPLICATION_ADDRESS) & 0x2FFE0000 ) == 0x20000000)
+	{
+	  JumpAddress = *(__IO uint32_t*) (APPLICATION_ADDRESS + 4);
+	  /* Jump to user application */
+	  JumpToApplication = (pFunction) JumpAddress;
+	  /* Initialize user application's Stack Pointer */
+	  __set_MSP(*(__IO uint32_t*) APPLICATION_ADDRESS);
+	Serial_PutString((uint8_t*)"jump to app success \r\n");
+	  JumpToApplication();
+		
+	}
       break;
     case '4' :
       if (FlashProtection != FLASHIF_PROTECTION_NONE)

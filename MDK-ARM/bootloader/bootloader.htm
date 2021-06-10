@@ -3,7 +3,7 @@
 <title>Static Call Graph - [bootloader\bootloader.axf]</title></head>
 <body><HR>
 <H1>Static Call Graph for image bootloader\bootloader.axf</H1><HR>
-<BR><P>#&#060CALLGRAPH&#062# ARM Linker, 5060750: Last Updated: Wed Jun 09 19:29:58 2021
+<BR><P>#&#060CALLGRAPH&#062# ARM Linker, 5060750: Last Updated: Thu Jun 10 13:55:01 2021
 <BR><P>
 <H3>Maximum Stack Usage =        464 bytes + Unknown(Cycles, Untraceable Function Pointers)</H3><H3>
 Call chain for Maximum Stack Depth:</H3>
@@ -903,7 +903,7 @@ Global Symbols
 <LI><a href="#[b7]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Ymodem_Transmit
 </UL>
 
-<P><STRONG><a name="[aa]"></a>Main_Menu</STRONG> (Thumb, 292 bytes, Stack size 16 bytes, menu.o(i.Main_Menu))
+<P><STRONG><a name="[aa]"></a>Main_Menu</STRONG> (Thumb, 310 bytes, Stack size 16 bytes, menu.o(i.Main_Menu))
 <BR><BR>[Stack]<UL><LI>Max Depth = 456<LI>Call Chain = Main_Menu &rArr; SerialDownload &rArr; Ymodem_Receive &rArr; ReceivePacket &rArr; RTT_printf &rArr; SEGGER_RTT_WriteString &rArr; SEGGER_RTT_Write
 </UL>
 <BR>[Calls]<UL><LI><a href="#[8c]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;HAL_FLASH_OB_Launch
@@ -997,7 +997,7 @@ Global Symbols
 <BR>[Called By]<UL><LI><a href="#[aa]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Main_Menu
 </UL>
 
-<P><STRONG><a name="[b8]"></a>Serial_PutByte</STRONG> (Thumb, 26 bytes, Stack size 8 bytes, ymodem.o(i.Serial_PutByte))
+<P><STRONG><a name="[b8]"></a>Serial_PutByte</STRONG> (Thumb, 34 bytes, Stack size 8 bytes, ymodem.o(i.Serial_PutByte))
 <BR><BR>[Stack]<UL><LI>Max Depth = 320<LI>Call Chain = Serial_PutByte &rArr; RTT_printf &rArr; SEGGER_RTT_WriteString &rArr; SEGGER_RTT_Write
 </UL>
 <BR>[Calls]<UL><LI><a href="#[ac]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;RTT_printf
@@ -1052,7 +1052,7 @@ Global Symbols
 </UL>
 <BR>[Address Reference Count : 1]<UL><LI> startup_stm32f407xx.o(RESET)
 </UL>
-<P><STRONG><a name="[b5]"></a>Ymodem_Receive</STRONG> (Thumb, 422 bytes, Stack size 72 bytes, ymodem.o(i.Ymodem_Receive))
+<P><STRONG><a name="[b5]"></a>Ymodem_Receive</STRONG> (Thumb, 430 bytes, Stack size 72 bytes, ymodem.o(i.Ymodem_Receive))
 <BR><BR>[Stack]<UL><LI>Max Depth = 416<LI>Call Chain = Ymodem_Receive &rArr; ReceivePacket &rArr; RTT_printf &rArr; SEGGER_RTT_WriteString &rArr; SEGGER_RTT_Write
 </UL>
 <BR>[Calls]<UL><LI><a href="#[bb]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Str2Int
