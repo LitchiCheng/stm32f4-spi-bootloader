@@ -101,7 +101,7 @@ static HAL_StatusTypeDef ReceivePacket(uint8_t *p_data, uint32_t *p_length, uint
   uint32_t crc;
   uint32_t packet_size = 0;
   HAL_StatusTypeDef status;
-  uint8_t char1;
+  uint8_t char1 = 0x00;
 
   *p_length = 0;
 	status = HAL_SPI_Receive(&hspi2, &char1, 1, timeout);
@@ -456,6 +456,7 @@ COM_StatusTypeDef Ymodem_Receive ( uint32_t *p_size )
           }
           break;
         case HAL_BUSY: /* Abort actually */
+			RTT_printf("HAL_BUSY.................\r\n");
           Serial_PutByte(CA);
           Serial_PutByte(CA);
           result = COM_ABORT;
@@ -467,9 +468,11 @@ COM_StatusTypeDef Ymodem_Receive ( uint32_t *p_size )
           }
           if (errors > MAX_ERRORS)
           {
+			  RTT_printf("Abort communication......\r\n");
             /* Abort communication */
             Serial_PutByte(CA);
             Serial_PutByte(CA);
+			result = COM_ERROR;
           }
           else
           {

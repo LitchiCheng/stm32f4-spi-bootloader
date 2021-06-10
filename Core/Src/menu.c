@@ -104,6 +104,20 @@ void SerialDownload(void)
     Serial_PutString(number);
     Serial_PutString((uint8_t *)" Bytes\r\n");
     Serial_PutString((uint8_t *)"-------------------\n");
+	  
+	RTT_printf("Start program execution......\r\n\n");
+	  /* execute the new program */
+	if (((*(__IO uint32_t*)APPLICATION_ADDRESS) & 0x2FFE0000 ) == 0x20000000)
+	{
+	  JumpAddress = *(__IO uint32_t*) (APPLICATION_ADDRESS + 4);
+	  /* Jump to user application */
+	  JumpToApplication = (pFunction) JumpAddress;
+	  /* Initialize user application's Stack Pointer */
+	  __set_MSP(*(__IO uint32_t*) APPLICATION_ADDRESS);
+	  RTT_printf("jump to app success \r\n");
+	  JumpToApplication();
+		
+	}
   }
   else if (result == COM_LIMIT)
   {
@@ -207,7 +221,8 @@ void Main_Menu(void)
 		char xx = 'C';
 		HAL_SPI_Transmit(&hspi2, (uint8_t*)&xx, 1, 100);
 		RTT_printf("EMIT SIGNAL for down\r\n");
-      SerialDownload();
+		SerialDownload();
+		
       break;
     case '2' :
       /* Upload user application from the Flash */

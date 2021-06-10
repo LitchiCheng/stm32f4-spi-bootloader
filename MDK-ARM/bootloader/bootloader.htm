@@ -3,7 +3,7 @@
 <title>Static Call Graph - [bootloader\bootloader.axf]</title></head>
 <body><HR>
 <H1>Static Call Graph for image bootloader\bootloader.axf</H1><HR>
-<BR><P>#&#060CALLGRAPH&#062# ARM Linker, 5060750: Last Updated: Thu Jun 10 13:55:01 2021
+<BR><P>#&#060CALLGRAPH&#062# ARM Linker, 5060750: Last Updated: Thu Jun 10 16:46:06 2021
 <BR><P>
 <H3>Maximum Stack Usage =        464 bytes + Unknown(Cycles, Untraceable Function Pointers)</H3><H3>
 Call chain for Maximum Stack Depth:</H3>
@@ -945,6 +945,7 @@ Global Symbols
 <LI><a href="#[a0]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__aeabi_memclr4
 </UL>
 <BR>[Called By]<UL><LI><a href="#[ab]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Serial_PutString
+<LI><a href="#[ad]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;SerialDownload
 <LI><a href="#[b5]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Ymodem_Receive
 <LI><a href="#[b8]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Serial_PutByte
 <LI><a href="#[b1]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;ReceivePacket
@@ -977,10 +978,11 @@ Global Symbols
 <P><STRONG><a name="[6]"></a>SVC_Handler</STRONG> (Thumb, 2 bytes, Stack size 0 bytes, stm32f4xx_it.o(i.SVC_Handler))
 <BR>[Address Reference Count : 1]<UL><LI> startup_stm32f407xx.o(RESET)
 </UL>
-<P><STRONG><a name="[ad]"></a>SerialDownload</STRONG> (Thumb, 100 bytes, Stack size 24 bytes, menu.o(i.SerialDownload))
+<P><STRONG><a name="[ad]"></a>SerialDownload</STRONG> (Thumb, 148 bytes, Stack size 24 bytes, menu.o(i.SerialDownload))
 <BR><BR>[Stack]<UL><LI>Max Depth = 440<LI>Call Chain = SerialDownload &rArr; Ymodem_Receive &rArr; ReceivePacket &rArr; RTT_printf &rArr; SEGGER_RTT_WriteString &rArr; SEGGER_RTT_Write
 </UL>
 <BR>[Calls]<UL><LI><a href="#[ab]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Serial_PutString
+<LI><a href="#[ac]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;RTT_printf
 <LI><a href="#[b6]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Int2Str
 <LI><a href="#[b5]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Ymodem_Receive
 </UL>
@@ -1052,7 +1054,7 @@ Global Symbols
 </UL>
 <BR>[Address Reference Count : 1]<UL><LI> startup_stm32f407xx.o(RESET)
 </UL>
-<P><STRONG><a name="[b5]"></a>Ymodem_Receive</STRONG> (Thumb, 430 bytes, Stack size 72 bytes, ymodem.o(i.Ymodem_Receive))
+<P><STRONG><a name="[b5]"></a>Ymodem_Receive</STRONG> (Thumb, 448 bytes, Stack size 72 bytes, ymodem.o(i.Ymodem_Receive))
 <BR><BR>[Stack]<UL><LI>Max Depth = 416<LI>Call Chain = Ymodem_Receive &rArr; ReceivePacket &rArr; RTT_printf &rArr; SEGGER_RTT_WriteString &rArr; SEGGER_RTT_Write
 </UL>
 <BR>[Calls]<UL><LI><a href="#[bb]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Str2Int
@@ -1125,7 +1127,7 @@ Local Symbols
 <BR>[Called By]<UL><LI><a href="#[5b]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;main
 </UL>
 
-<P><STRONG><a name="[b1]"></a>ReceivePacket</STRONG> (Thumb, 248 bytes, Stack size 32 bytes, ymodem.o(i.ReceivePacket))
+<P><STRONG><a name="[b1]"></a>ReceivePacket</STRONG> (Thumb, 252 bytes, Stack size 32 bytes, ymodem.o(i.ReceivePacket))
 <BR><BR>[Stack]<UL><LI>Max Depth = 344<LI>Call Chain = ReceivePacket &rArr; RTT_printf &rArr; SEGGER_RTT_WriteString &rArr; SEGGER_RTT_Write
 </UL>
 <BR>[Calls]<UL><LI><a href="#[ac]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;RTT_printf
