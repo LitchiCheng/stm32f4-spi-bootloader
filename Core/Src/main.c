@@ -23,6 +23,7 @@
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 #include "menu.h"
+#include "SEGGER_RTT.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -92,26 +93,20 @@ int main(void)
   MX_DMA_Init();
   MX_SPI2_Init();
   /* USER CODE BEGIN 2 */
-  
-  /* Initialize Key Button mounted on STM324xG-EVAL board */
-  //BSP_PB_Init(BUTTON_KEY, BUTTON_MODE_GPIO);
 
+  
   /* Test if Key push-button is pressed */
-  if (/*BSP_PB_GetState(BUTTON_KEY) == GPIO_PIN_RESET*/1)
+  uint16_t boot_option = *(__IO uint16_t*)( BOOT_OPT_VAR_ADDRESS );
+  RTT_printf("the boot option is 0x%04x...........\r\n", boot_option);
+  if (boot_option == 0xAABB)
   { 
     /* Execute the IAP driver in order to reprogram the Flash */
-    //IAP_Init();
-    /* Display main menu */
-//	while(1){
-//		char xx = 'C';
-//		HAL_SPI_Transmit(&hspi2, (uint8_t*)&xx, 1, 100);
-//		HAL_Delay(100);
-//	}
     Main_Menu ();
   }
   /* Keep the user application running */
   else
   {
+	RTT_printf("check the app...........\r\n");
     /* Test if user code is programmed starting from address "APPLICATION_ADDRESS" */
     if (((*(__IO uint32_t*)APPLICATION_ADDRESS) & 0x2FFE0000 ) == 0x20000000)
     {
@@ -121,7 +116,21 @@ int main(void)
       /* Initialize user application's Stack Pointer */
       __set_MSP(*(__IO uint32_t*) APPLICATION_ADDRESS);
       JumpToApplication();
-    }
+    }else{
+		RTT_printf("app can't be used, wait the fw...........\r\n");
+		
+		uint16_t BOOT = 0xAABB;
+		
+        HAL_FLASH_Unlock();               //解锁Flash
+		
+		FLASH_If_Erase(BOOT_OPT_VAR_ADDRESS);
+		
+        HAL_FLASH_Program(FLASH_TYPEPROGRAM_HALFWORD, BOOT_OPT_VAR_ADDRESS, BOOT); //对Flash进行烧写，FLASH_TYPEPROGRAM_HALFWORD 声明操作的Flash地址的16位的，此外还有32位跟64位的操作，自行翻查HAL库的定义即可
+
+        HAL_FLASH_Lock(); //锁住Flash
+		
+		Main_Menu();
+	}
   }
 
   /* USER CODE END 2 */
