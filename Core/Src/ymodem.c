@@ -365,7 +365,8 @@ COM_StatusTypeDef Ymodem_Receive ( uint32_t *p_size )
               break;
             case 0:
               /* End of transmission */
-              Serial_PutByte(0x5A);
+              Serial_PutByte(0x66);
+				Serial_PutByte(0x66);
 			  RTT_printf("eot ......\r\n");
               file_done = 1;
 				session_done = 1;

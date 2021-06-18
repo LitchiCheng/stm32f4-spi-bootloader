@@ -106,6 +106,8 @@ void SerialDownload(void)
     Serial_PutString((uint8_t *)"-------------------\n");
 	  
 	RTT_printf("Start program execution......\r\n\n");
+	  
+	HAL_Delay(100);
 	  /* execute the new program */
 	if (((*(__IO uint32_t*)APPLICATION_ADDRESS) & 0x2FFE0000 ) == 0x20000000)
 	{
@@ -185,6 +187,7 @@ void Main_Menu(void)
 
   while (1)
   {
+	  RESET:
 	HAL_GPIO_WritePin(GPIOC, GPIO_PIN_8, GPIO_PIN_SET);
 	HAL_GPIO_WritePin(GPIOC, GPIO_PIN_9, GPIO_PIN_SET);
     /* Test if any sector of Flash memory where user application will be loaded is write protected */
@@ -209,7 +212,9 @@ void Main_Menu(void)
     //__HAL_UART_FLUSH_DRREGISTER(&UartHandle);
 	
     /* Receive key */
-    HAL_SPI_Receive(&hspi2, &key, 1, RX_TIMEOUT);
+	key = 0;
+    HAL_SPI_Receive_DMA(&hspi2, &key, 1);
+	HAL_Delay(1000);
 	RTT_printf("key is 0x%02x\r\n", key);
 	
 	
@@ -278,8 +283,9 @@ void Main_Menu(void)
       }
       break;
     default:
-	Serial_PutString((uint8_t *)"Invalid Number ! ==> The number should be either 1, 2, 3 or 4\r");
-	break;
+		Serial_PutString((uint8_t *)"Invalid Number ! ==> The number should be either 1, 2, 3 or 4\r");
+		goto RESET;
+		break;
     }
   }
 }
