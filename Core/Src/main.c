@@ -24,6 +24,7 @@
 /* USER CODE BEGIN Includes */
 #include "menu.h"
 #include "SEGGER_RTT.h"
+#include "drv_flash.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -118,16 +119,9 @@ int main(void)
       JumpToApplication();
     }else{
 		RTT_printf("app can't be used, wait the fw...........\r\n");
-		
 		uint16_t BOOT = 0xAABB;
-		
-        HAL_FLASH_Unlock();               //解锁Flash
-		
-		FLASH_If_Erase(BOOT_OPT_VAR_ADDRESS);
-		
-        HAL_FLASH_Program(FLASH_TYPEPROGRAM_HALFWORD, BOOT_OPT_VAR_ADDRESS, BOOT); //对Flash进行烧写，FLASH_TYPEPROGRAM_HALFWORD 声明操作的Flash地址的16位的，此外还有32位跟64位的操作，自行翻查HAL库的定义即可
-
-        HAL_FLASH_Lock(); //锁住Flash
+		stm32_flash_erase(BOOT_OPT_VAR_ADDRESS, 2);
+		stm32_flash_write(BOOT_OPT_VAR_ADDRESS, (uint8_t*)&BOOT, 2);
 		
 		Main_Menu();
 	}

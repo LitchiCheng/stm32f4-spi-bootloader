@@ -437,6 +437,11 @@
               <FileType>1</FileType>
               <FilePath>../Core/Src/stm32f4xx_hal_msp.c</FilePath>
             </File>
+            <File>
+              <FileName>drv_flash_f4.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Core\Src\drv_flash_f4.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
