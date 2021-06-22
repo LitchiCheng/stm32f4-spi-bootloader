@@ -76,11 +76,10 @@ extern SPI_HandleTypeDef hspi2;
 
 #include "SEGGER_RTT.h"
 void Serial_PutByte(uint8_t xx){
-	if(xx == 0x15){
-		RTT_printf("Serial_PutByte 0x%02x..........................\r\n", xx);
-	}else
-		RTT_printf("Serial_PutByte 0x%02x\r\n", xx);
-	HAL_SPI_Transmit(&hspi2, &xx,1,900000000);
+	uint8_t rec = 0;
+	HAL_SPI_TransmitReceive(&hspi2, &xx, &rec ,1, 9999999);
+	//HAL_SPI_Transmit(&hspi2, &xx,1, HAL_MAX_DELAY);
+	RTT_printf("Serial_PutByte 0x%02x 0x%02x............................................\r\n", xx, rec);
 }
 
 /* Private functions ---------------------------------------------------------*/
@@ -98,86 +97,86 @@ void Serial_PutByte(uint8_t xx){
   */
 static HAL_StatusTypeDef ReceivePacket(uint8_t *p_data, uint32_t *p_length, uint32_t timeout)
 {
-  uint32_t crc;
-  uint32_t packet_size = 0;
-  HAL_StatusTypeDef status;
-  uint8_t char1 = 0x00;
+	uint32_t crc;
+	uint32_t packet_size = 0;
+	HAL_StatusTypeDef status;
+	uint8_t char1 = 0x00;
 
-  *p_length = 0;
+	*p_length = 0;
 	status = HAL_SPI_Receive(&hspi2, &char1, 1, timeout);
 	RTT_printf("ReceivePacket is 0x%02x\r\n", char1);
-  if (status == HAL_OK)
-  {
-    switch (char1)
-    {
-      case SOH:
-        packet_size = PACKET_SIZE;
-        break;
-      case STX:
-        packet_size = PACKET_1K_SIZE;
-        break;
-      case EOT:
-        break;
-      case CA:
-        if ((HAL_SPI_Receive(&hspi2, &char1, 1, timeout) == HAL_OK) && (char1 == CA))
-        {
-          packet_size = 2;
-        }
-        else
-        {
-          status = HAL_ERROR;
-        }
-        break;
-      case ABORT1:
-      case ABORT2:
-        status = HAL_BUSY;
-        break;
-      default:
-        status = HAL_ERROR;
-        break;
-    }
-    *p_data = char1;
+	if (status == HAL_OK)
+	{
+	switch (char1)
+	{
+	  case SOH:
+		packet_size = PACKET_SIZE;
+		break;
+	  case STX:
+		packet_size = PACKET_1K_SIZE;
+		break;
+	  case EOT:
+		break;
+	  case CA:
+		if ((HAL_SPI_Receive(&hspi2, &char1, 1, timeout) == HAL_OK) && (char1 == CA))
+		{
+		  packet_size = 2;
+		}
+		else
+		{
+		  status = HAL_ERROR;
+		}
+		break;
+	  case ABORT1:
+	  case ABORT2:
+		status = HAL_BUSY;
+		break;
+	  default:
+		status = HAL_ERROR;
+		break;
+	}
+	*p_data = char1;
 
-    if (packet_size >= PACKET_SIZE )
-    {
-      status = HAL_SPI_Receive(&hspi2, &p_data[PACKET_NUMBER_INDEX],packet_size + PACKET_OVERHEAD_SIZE, timeout);
-      RTT_printf("pack data %d\r\n", packet_size + PACKET_OVERHEAD_SIZE);
-      for(int i=0;i<packet_size + PACKET_OVERHEAD_SIZE;i++){
-        RTT_printf("0x%02x ", (&p_data[PACKET_NUMBER_INDEX])[i]);
-      }
-      RTT_printf("\r\n");
+	if (packet_size >= PACKET_SIZE )
+	{
+	  status = HAL_SPI_Receive(&hspi2, &p_data[PACKET_NUMBER_INDEX],packet_size + PACKET_OVERHEAD_SIZE, timeout);
+	  RTT_printf("pack data %d\r\n", packet_size + PACKET_OVERHEAD_SIZE);
+	  for(int i=0;i<packet_size + PACKET_OVERHEAD_SIZE;i++){
+		RTT_printf("0x%02x ", (&p_data[PACKET_NUMBER_INDEX])[i]);
+	  }
+	  RTT_printf("\r\n");
 
-      /* Simple packet sanity check */
-      if (status == HAL_OK )
-      {
-        if (p_data[PACKET_NUMBER_INDEX] != ((p_data[PACKET_CNUMBER_INDEX]) ^ NEGATIVE_BYTE))
-        {
-          packet_size = 0;
-          status = HAL_ERROR;
-        }
-        else
-        {
-          /* Check packet CRC */
-          crc = p_data[ packet_size + PACKET_DATA_INDEX ] << 8;
-          crc += p_data[ packet_size + PACKET_DATA_INDEX + 1 ];
-          if (Cal_CRC16(&p_data[PACKET_DATA_INDEX], packet_size) != crc )
-          {
-            packet_size = 0;
-            status = HAL_ERROR;
-            RTT_printf("check fail\r\n");
-          }else{
-            RTT_printf("check ok\r\n");
-          }
-        }
-      }
-      else
-      {
-        packet_size = 0;
-      }
-    }
-  }
-  *p_length = packet_size;
-  return status;
+	  /* Simple packet sanity check */
+	  if (status == HAL_OK )
+	  {
+		if (p_data[PACKET_NUMBER_INDEX] != ((p_data[PACKET_CNUMBER_INDEX]) ^ NEGATIVE_BYTE))
+		{
+		  packet_size = 0;
+		  status = HAL_ERROR;
+		}
+		else
+		{
+		  /* Check packet CRC */
+		  crc = p_data[ packet_size + PACKET_DATA_INDEX ] << 8;
+		  crc += p_data[ packet_size + PACKET_DATA_INDEX + 1 ];
+		  if (Cal_CRC16(&p_data[PACKET_DATA_INDEX], packet_size) != crc )
+		  {
+			packet_size = 0;
+			status = HAL_ERROR;
+			RTT_printf("check fail\r\n");
+		  }else{
+			RTT_printf("check ok\r\n");
+		  }
+		}
+	  }
+	  else
+	  {
+		packet_size = 0;
+	  }
+	}
+	}
+	*p_length = packet_size;
+	return status;
 }
 
 /**
@@ -366,7 +365,7 @@ COM_StatusTypeDef Ymodem_Receive ( uint32_t *p_size )
             case 0:
               /* End of transmission */
               Serial_PutByte(0x66);
-				Serial_PutByte(0x66);
+				//Serial_PutByte(0x66);
 			  RTT_printf("eot ......\r\n");
               file_done = 1;
 				session_done = 1;
@@ -421,17 +420,20 @@ COM_StatusTypeDef Ymodem_Receive ( uint32_t *p_size )
                       result = COM_LIMIT;
                     }
                     /* erase user application area */
-					          RTT_printf("FLASH_If_Erase start \r\n");
+					RTT_printf("FLASH_If_Erase start \r\n");
                     FLASH_If_Erase(APPLICATION_ADDRESS);
                     *p_size = filesize;
-
+					__HAL_SPI_CLEAR_OVRFLAG(&hspi2);
                     Serial_PutByte(ACK);
                     Serial_PutByte(CRC16);
-					          RTT_printf("CRC16 end \r\n");
+//					while(1){
+//					}
+					RTT_printf("CRC16 end \r\n");
                   }
                   /* File header packet is empty, end session */
                   else
                   {
+					
                     Serial_PutByte(ACK);
                     file_done = 1;
                     session_done = 1;
@@ -445,7 +447,8 @@ COM_StatusTypeDef Ymodem_Receive ( uint32_t *p_size )
                   if (FLASH_If_Write(flashdestination, (uint32_t*) ramsource, packet_length/4) == FLASHIF_OK)
                   {
                     flashdestination += packet_length;
-                    Serial_PutByte(ACK);
+					__HAL_SPI_CLEAR_OVRFLAG(&hspi2);
+                    Serial_PutByte(aPacketData[PACKET_NUMBER_INDEX]);
                   }
                   else /* An error occurred while writing to Flash memory */
                   {
@@ -457,7 +460,7 @@ COM_StatusTypeDef Ymodem_Receive ( uint32_t *p_size )
                 }
                 packets_received ++;
                 session_begin = 1;
-				        RTT_printf("end \r\n");
+				RTT_printf("end \r\n");
               }
               break;
           }

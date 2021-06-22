@@ -111,18 +111,7 @@ void SerialDownload(void)
 	stm32_flash_erase(BOOT_OPT_VAR_ADDRESS, 2);
 	stm32_flash_write(BOOT_OPT_VAR_ADDRESS, (uint8_t*)&BOOT, 2);
 	HAL_Delay(100);
-	/* execute the new program */
-	if (((*(__IO uint32_t*)APPLICATION_ADDRESS) & 0x2FFE0000 ) == 0x20000000)
-	{
-	  JumpAddress = *(__IO uint32_t*) (APPLICATION_ADDRESS + 4);
-	  /* Jump to user application */
-	  JumpToApplication = (pFunction) JumpAddress;
-	  /* Initialize user application's Stack Pointer */
-	  __set_MSP(*(__IO uint32_t*) APPLICATION_ADDRESS);
-	  RTT_printf("jump to app success \r\n");
-	  JumpToApplication();
-		
-	}
+	NVIC_SystemReset();
   }
   else if (result == COM_LIMIT)
   {
@@ -177,14 +166,13 @@ void SerialUpload(void)
   */
 void Main_Menu(void)
 {
-  uint8_t key = 0;
+  uint8_t start_repley[3] = {0XA5,0X88,0X5A};
+  uint8_t start_receve[3] = {0X00,0X00,0X00};
 
   Serial_PutString((uint8_t *)"\r\n======================================================================");
-  Serial_PutString((uint8_t *)"\r\n=              (C) COPYRIGHT 2016 STMicroelectronics                 =");
-  Serial_PutString((uint8_t *)"\r\n=                                                                    =");
   Serial_PutString((uint8_t *)"\r\n=          STM32F4xx In-Application Programming Application          =");
   Serial_PutString((uint8_t *)"\r\n=                                                                    =");
-  Serial_PutString((uint8_t *)"\r\n=                       By MCD Application Team                      =");
+  Serial_PutString((uint8_t *)"\r\n=                       By Seer Controller BU                      =");
   Serial_PutString((uint8_t *)"\r\n======================================================================");
   Serial_PutString((uint8_t *)"\r\n\r\n");
 
@@ -193,92 +181,35 @@ void Main_Menu(void)
 RESET:
 	HAL_GPIO_WritePin(GPIOC, GPIO_PIN_8, GPIO_PIN_SET);
 	HAL_GPIO_WritePin(GPIOC, GPIO_PIN_9, GPIO_PIN_SET);
-    /* Test if any sector of Flash memory where user application will be loaded is write protected */
-    FlashProtection = FLASH_If_GetWriteProtectionStatus();
     Serial_PutString((uint8_t *)"\r\n=================== Main Menu ============================\r\n\n");
     Serial_PutString((uint8_t *)"  Download image to the internal Flash ----------------- 1\r\n\n");
     Serial_PutString((uint8_t *)"  Upload image from the internal Flash ----------------- 2\r\n\n");
-    Serial_PutString((uint8_t *)"  Execute the loaded application ----------------------- 3\r\n\n");
-    if(FlashProtection != FLASHIF_PROTECTION_NONE){
-      Serial_PutString((uint8_t *)"  Disable the write protection ------------------------- 4\r\n\n");
-    }else{
-      Serial_PutString((uint8_t *)"  Enable the write protection -------------------------- 4\r\n\n");
-    }
     Serial_PutString((uint8_t *)"==========================================================\r\n\n");
-
-    /* Clean the input path */
-    //__HAL_UART_FLUSH_DRREGISTER(&UartHandle);
 	
+	#include "string.h"
     /* Receive key */
-	key = 0;
-    HAL_SPI_Receive_DMA(&hspi2, &key, 512);
-	HAL_Delay(1000);
-	RTT_printf("key is 0x%02x\r\n", key);
+	memset(start_receve, 0x00, 3);
+    HAL_SPI_TransmitReceive(&hspi2, start_repley, start_receve, 3, 99999999);
+	RTT_printf("key is 0x%02x 0x%02x 0x%02x\r\n", start_receve[0], start_receve[1], start_receve[2]);
 	
-    switch (key)
+	char case_key = 0;
+	if(start_receve[0] == 0xA5 && start_receve[1] == 0x77 && start_receve[2] == 0x5A){
+		case_key = '1';
+	}
+	
+    switch (case_key)
     {
     case '1' :
 	{
-      /* Download user application in the Flash */
-		char xx = 'C';
-		HAL_SPI_Transmit(&hspi2, (uint8_t*)&xx, 1, 1000);
-		RTT_printf("EMIT SIGNAL for down\r\n");
+		RTT_printf("Start to download................\r\n");
 		SerialDownload();
-      break;
+		break;
 	}
     case '2' :
       /* Upload user application from the Flash */
 		RTT_printf("Start SerialUpload......\r\n\n");
-      SerialUpload();
-      break;
-    case '3' :
-      Serial_PutString((uint8_t *)"Start program execution......\r\n\n");
-		HAL_Delay(1000);
-		/* execute the new program */
-		if (((*(__IO uint32_t*)APPLICATION_ADDRESS) & 0x2FFE0000 ) == 0x20000000)
-		{
-			JumpAddress = *(__IO uint32_t*) (APPLICATION_ADDRESS + 4);
-			/* Jump to user application */
-			JumpToApplication = (pFunction) JumpAddress;
-			/* Initialize user application's Stack Pointer */
-			__set_MSP(*(__IO uint32_t*) APPLICATION_ADDRESS);
-			Serial_PutString((uint8_t*)"jump to app success \r\n");
-			JumpToApplication();
-		}
-      break;
-    case '4' :
-      if (FlashProtection != FLASHIF_PROTECTION_NONE)
-      {
-        /* Disable the write protection */
-        if (FLASH_If_WriteProtectionConfig(OB_WRPSTATE_DISABLE) == HAL_OK)
-        {
-          Serial_PutString((uint8_t *)"Write Protection disabled...\r\n");
-          Serial_PutString((uint8_t *)"System will now restart...\r\n");
-          /* Launch the option byte loading */
-          HAL_FLASH_OB_Launch();
-          /* Ulock the flash */
-          HAL_FLASH_Unlock();
-        }
-        else
-        {
-          Serial_PutString((uint8_t *)"Error: Flash write un-protection failed...\r\n");
-        }
-      }
-      else
-      {
-        if (FLASH_If_WriteProtectionConfig(OB_WRPSTATE_ENABLE) == HAL_OK)
-        {
-          Serial_PutString((uint8_t *)"Write Protection enabled...\r\n");
-          Serial_PutString((uint8_t *)"System will now restart...\r\n");
-          /* Launch the option byte loading */
-          HAL_FLASH_OB_Launch();
-        }
-        else
-        {
-          Serial_PutString((uint8_t *)"Error: Flash write protection failed...\r\n");
-        }
-      }
-      break;
+		SerialUpload();
+		break;
     default:
 		Serial_PutString((uint8_t *)"Invalid Number ! ==> The number should be either 1, 2, 3 or 4\r");
 		goto RESET;
