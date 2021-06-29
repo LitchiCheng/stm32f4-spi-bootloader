@@ -99,6 +99,7 @@ int main(void)
   MX_SPI2_Init();
   /* USER CODE BEGIN 2 */
 
+  //HAL_Delay(1000);
   
   /* Test if Key push-button is pressed */
   uint16_t boot_option = *(__IO uint16_t*)( BOOT_OPT_VAR_ADDRESS );
